@@ -1,4 +1,4 @@
-trait Event {
+pub trait Event {
     type Id: Eq;
     type Version: Eq + Ord;
 
@@ -6,7 +6,7 @@ trait Event {
     fn version(&self) -> Self::Version;
 }
 
-trait Aggregate: Sized {
+pub trait Aggregate: Sized {
     type Error: std::error::Error;
     type Event: Event<Id = Self::Id, Version = Self::Version>;
     type Id: Eq;
@@ -20,7 +20,8 @@ trait Aggregate: Sized {
     fn version(&self) -> Self::Version;
 }
 
-trait Repository {
+#[async_trait::async_trait]
+pub trait Repository {
     type Aggregate: Aggregate;
     type Error: std::error::Error;
 
@@ -174,6 +175,7 @@ mod tests {
         events: std::sync::Arc<std::sync::Mutex<Vec<(AggregateId, Vec<AggregateEvent>)>>>,
     }
 
+    #[async_trait::async_trait]
     impl Repository for RepositoryImpl {
         type Aggregate = AggregateImpl;
         type Error = std::io::Error;

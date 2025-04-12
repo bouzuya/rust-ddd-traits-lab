@@ -1,4 +1,4 @@
-trait Aggregate: Sized {
+pub trait Aggregate: Sized {
     type Id: Eq;
     type Version: Eq + Ord;
 
@@ -6,7 +6,8 @@ trait Aggregate: Sized {
     fn version(&self) -> &Self::Version;
 }
 
-trait Repository {
+#[async_trait::async_trait]
+pub trait Repository {
     type Aggregate: Aggregate;
     type Error: std::error::Error;
 
@@ -61,6 +62,7 @@ mod tests {
 
     struct RepositoryImpl;
 
+    #[async_trait::async_trait]
     impl Repository for RepositoryImpl {
         type Aggregate = AggregateImpl;
         type Error = std::io::Error;
@@ -86,5 +88,12 @@ mod tests {
         let aggregate = AggregateImpl::create();
         assert_eq!(aggregate.id(), &AggregateId("1".to_owned()));
         assert_eq!(aggregate.version(), &AggregateVersion(1));
+    }
+
+    #[tokio::test]
+    async fn test_repository() {
+        let _repository = RepositoryImpl;
+
+        // ...
     }
 }
